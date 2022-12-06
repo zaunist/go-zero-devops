@@ -1,0 +1,8 @@
+Name: order
+Host: 0.0.0.0
+Port: 8888
+UserRpc:
+  Etcd:
+    Hosts:
+    - docker.for.mac.host.internal:2379
+    Key: user.rpc
