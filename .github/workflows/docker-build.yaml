@@ -32,7 +32,7 @@ jobs:
           context: .
           file: ./api/Dockerfile
           push: true
-          tags: go-zero-devops/api:latest
+          tags: ${{ secrets.HARBOR_ADDR }}/go-zero-devops/api:latest
 
       -
         name: Build and push rpc
@@ -41,4 +41,4 @@ jobs:
           context: .
           file: ./rpc/user/Dockerfile
           push: true
-          tags: go-zero-devops/rpc:latest
+          tags: ${{ secrets.HARBOR_ADDR }}/go-zero-devops/rpc:latest
