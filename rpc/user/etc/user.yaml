@@ -2,5 +2,12 @@ Name: user.rpc
 ListenOn: 0.0.0.0:8080
 Etcd:
   Hosts:
-  - 127.0.0.1:2379
+  - 192.168.16.232:2379
   Key: user.rpc
+
+DataSource: postgres://postgres:password123@192.168.23.3:5432/go-zero-devops?sslmode=disable
+
+Table: user
+
+Cache:
+  - Host: localhost:6379

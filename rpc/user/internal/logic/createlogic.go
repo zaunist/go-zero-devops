@@ -3,6 +3,7 @@ package logic
 import (
 	"context"
 
+	"go-zero-devops/rpc/model"
 	"go-zero-devops/rpc/user/internal/svc"
 	"go-zero-devops/rpc/user/types/user"
 
@@ -25,6 +26,13 @@ func NewCreateLogic(ctx context.Context, svcCtx *svc.ServiceContext) *CreateLogi
 
 func (l *CreateLogic) Create(in *user.ReqUser) (*user.CommResp, error) {
 	// todo: add your logic here and delete this line
+	_, err := l.svcCtx.Model.Insert(l.ctx, &model.USER{
+		Password: in.Password,
+		Username: in.Username,
+	})
+	if err != nil {
+		return nil, err
+	}
 
-	return &user.CommResp{}, nil
+	return &user.CommResp{Ok: true}, nil
 }

@@ -5,6 +5,7 @@ import (
 
 	"go-zero-devops/api/internal/svc"
 	"go-zero-devops/api/internal/types"
+	"go-zero-devops/rpc/user/types/user"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -25,6 +26,10 @@ func NewAddUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *AddUserLo
 
 func (l *AddUserLogic) AddUser(req *types.ReqUser) (resp *types.CommResp, err error) {
 	// todo: add your logic here and delete this line
+	r, err := l.svcCtx.User.Create(l.ctx, &user.ReqUser{Username: req.Username, Password: req.Password})
+	if err != nil {
+		return nil, err
+	}
 
-	return
+	return &types.CommResp{Ok: r.Ok}, nil
 }

@@ -5,6 +5,7 @@ import (
 
 	"go-zero-devops/api/internal/svc"
 	"go-zero-devops/api/internal/types"
+	"go-zero-devops/rpc/user/users"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -25,6 +26,10 @@ func NewDeleteUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Delete
 
 func (l *DeleteUserLogic) DeleteUser(req *types.ReqUserId) (resp *types.CommResp, err error) {
 	// todo: add your logic here and delete this line
+	r, err := l.svcCtx.User.Delete(l.ctx, &users.ReqUserId{Id: req.Id})
+	if err != nil {
+		return nil, err
+	}
 
-	return
+	return &types.CommResp{Ok: r.Ok}, nil
 }
