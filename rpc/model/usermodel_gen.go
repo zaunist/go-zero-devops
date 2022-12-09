@@ -44,7 +44,7 @@ type (
 func newUSERModel(conn sqlx.SqlConn) *defaultUSERModel {
 	return &defaultUSERModel{
 		conn:  conn,
-		table: `"public"."USER"`,
+		table: `"public"."user"`,
 	}
 }
 

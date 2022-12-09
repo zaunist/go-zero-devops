@@ -1,6 +1,17 @@
 version: '2'
 
 services:
+  etcd:
+    image: 'bitnami/etcd:latest'
+    environment:
+      - ALLOW_NONE_AUTHENTICATION=yes
+      - ETCD_ADVERTISE_CLIENT_URLS=http://etcd:2379
+    ports:
+      - 2379:2379
+      - 2380:2380
+    networks:
+      go-zero-devops:
+        ipv4_address: 172.16.238.10
   postgresql:
     image: docker.io/bitnami/postgresql:15
     ports:
@@ -9,6 +20,9 @@ services:
       - 'postgresql_data:/bitnami/postgresql'
     environment:
       - POSTGRESQL_PASSWORD=password123
+    networks:
+      go-zero-devops:
+        ipv4_address: 172.16.238.20
   redis:
     image: docker.io/bitnami/redis:7.0
     environment:
@@ -19,9 +33,47 @@ services:
       - '6379:6379'
     volumes:
       - 'redis_data:/bitnami/redis/data'
+    networks:
+      go-zero-devops:
+        ipv4_address: 172.16.238.30
 
+  rpc-user:
+    build:
+      context: ../
+      dockerfile: ./rpc/user/Dockerfile
+    depends_on:
+      - etcd
+      - postgresql
+      - redis
+    ports:
+      - '8080:8080/tcp'
+    networks:
+      go-zero-devops:
+        ipv4_address: 172.16.238.40
+
+  api-user:
+    build:
+      context: ../
+      dockerfile: ./api/Dockerfile
+    depends_on:
+      - etcd
+      - postgresql
+      - redis
+    ports:
+      - '8888:8888/tcp'
+    networks:
+      go-zero-devops:
+        ipv4_address: 172.16.238.50
 volumes:
   postgresql_data:
     driver: local
   redis_data:
     driver: local
+
+networks:
+  go-zero-devops:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.16.238.0/24

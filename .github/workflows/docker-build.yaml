@@ -31,7 +31,7 @@ jobs:
         with:
           context: ./api
           push: true
-          tags: user/api:latest
+          tags: go-zero-devops/api:latest
 
       -
         name: Build and push rpc
@@ -39,4 +39,4 @@ jobs:
         with:
           context: ./rpc/user
           push: true
-          tags: user/rpc:latest
+          tags: go-zero-devops/rpc:latest

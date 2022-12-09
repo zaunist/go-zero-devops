@@ -62,7 +62,9 @@ func (m *customUSERModel) FindByName(ctx context.Context, name string) (*USER, e
 
 func (m *customUSERModel) FindAll() ([]*USER, error) {
 	var resp []*USER
-	err := m.QueryRowsNoCache(&resp, "select * from user")
+
+	query := fmt.Sprintf("select * from %s", m.table)
+	err := m.QueryRowsNoCache(&resp, query)
 	switch err {
 	case nil:
 		return resp, nil
