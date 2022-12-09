@@ -29,7 +29,8 @@ jobs:
         name: Build and push api
         uses: docker/build-push-action@v3
         with:
-          context: ./api
+          context: .
+          file: ./api/Dockerfile
           push: true
           tags: go-zero-devops/api:latest
 
@@ -37,6 +38,7 @@ jobs:
         name: Build and push rpc
         uses: docker/build-push-action@v3
         with:
-          context: ./rpc/user
+          context: .
+          file: ./rpc/user/Dockerfile
           push: true
           tags: go-zero-devops/rpc:latest
