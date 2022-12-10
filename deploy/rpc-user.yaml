@@ -1,0 +1,136 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rpc-user
+  namespace: civil3-backend
+  labels:
+    app: rpc-user
+spec:
+  replicas: 3
+  revisionHistoryLimit: 5
+  selector:
+    matchLabels:
+      app: rpc-user
+  template:
+    metadata:
+      labels:
+        app: rpc-user
+    spec:
+      containers:
+        - name: rpc-user
+          image: registry.civil3.xyz/go-zero-devops/rpc@sha256:8569374a6233442f4d679c2f775a915d7a71391dc504158c1b349b1b92f50a27
+          ports:
+          - containerPort: 8080
+          readinessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          livenessProbe:
+            tcpSocket:
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 500m
+              memory: 512Mi
+            limits:
+              cpu: 1000m
+              memory: 1024Mi
+          volumeMounts:
+            - name: timezone
+              mountPath: /etc/localtime
+            - name: rpc-user
+              mountPath: /app/etc/user.yaml
+              subPath: user.yaml
+      volumes:
+        - name: timezone
+          hostPath:
+            path: /usr/share/zoneinfo/Asia/Shanghai
+        - name: rpc-user
+          configMap:
+            name: rpc-user
+
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: rpc-user-svc
+  namespace: civil3-backend
+spec:
+  ports:
+    - port: 8080
+      targetPort: 8080
+  selector:
+    app: rpc-user
+
+---
+
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: rpc-user-hpa-c
+  namespace: civil3-backend
+  labels:
+    app: rpc-user-hpa-c
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: rpc-user
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        targetAverageUtilization: 80
+
+---
+
+apiVersion: autoscaling/v2beta1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: rpc-user-hpa-m
+  namespace: civil3-backend
+  labels:
+    app: rpc-user-hpa-m
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: rpc-user
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: memory
+        targetAverageUtilization: 80
+
+---
+
+kind: ConfigMap
+apiVersion: v1
+metadata:
+  name: rpc-user
+  namespace: civil3-backend
+  labels:
+  annotations:
+data:
+  user.yaml: |
+    Name: user.rpc
+    ListenOn: 0.0.0.0:8080
+    Etcd:
+      Hosts:
+        - etcd-demo.civil3-backend:2379
+      Key: user.rpc
+
+    DataSource: postgres://zaunist:Admin123..@postgre-demo-postgresql.civil3-backend:5432/go-zero-devops?sslmode=disable
+
+    Table: user
+
+    Cache:
+      - Host: redis-demo.civil3-backend:6379
